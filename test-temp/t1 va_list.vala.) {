@@ -1,0 +1,10 @@
+int sum (int x, ...) {
+    int result = x;
+    va_list list = va_list ();
+    for (int? y = list.arg<int?> (); y != null; y = list.arg<int?> ()) {
+        result += y;
+    }
+    return result;
+}
+
+int a = sum (1, 2, 3, 36);

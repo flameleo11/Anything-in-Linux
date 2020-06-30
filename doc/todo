@@ -1,0 +1,281 @@
+			// todo
+todo:
+20200325
+
+
+new png
+
+0
+/drive_d/work/Everthing/dist/anything.sh
+set current dir
+
+0.5
+pack res to exe
+
+1 change colum by add return index
+2 add icon to folder
+3 change text align
+   for type date and size : right align
+   name path : left align
+4 add type column
+5 adjust add column system
+  for add new column easily
+
+6 type char , changed text , trigger pre search
+   enter & first type space trigger new search
+   cache this session results
+   for type space add new filter
+
+
+7 read Gtk.ListStore diff Glib.ListStore
+
+
+8 search end, but no results
+  need a status
+  for searching ....
+
+9 search session for update date
+  incase mix multi session results
+
+10 search actions cancel
+
+11 other  match methods
+   by lua scripts or python
+
+12 tray icon, for minify
+
+13 double click colum
+   right click for menu
+
+   bind action for xdg-open
+
+14 status bar cool down
+15 search session methods by
+   a: search text
+   b: search prefix keywords
+
+16 KiB KB change in menu
+   add smart round
+17 compare speed with fsearch
+
+
+1 some names
+
+Ryu names
+Fort minor
+
+minor thing
+mini thing
+many thing
+any thing
+
+ever loc
+ever thing
+
+everything reforge
+everything rebuild
+
+2
+reforge code structure
+
+
+
+3
+tree view
+column resize
+
+
+public int insert_column (TreeViewColumn column, int position)
+This inserts the column into the this at position.
+public int insert_column_with_attributes (int position, string? title, CellRenderer cell, ...)
+Creates a new TreeViewColumn and inserts it into the this at position.
+
+
+4
+already set on sh return lines
+    // SET ROW 20
+
+
+5
+re  trim retrun line
+by locate cmd
+
+
+6
+alread get file info
+but path not trim
+
+7
+pass args
+"/drive_d/work/everything search copy/t2.vala"
+"/drive_d/work/everything search copy/t2.vala"
+
+8
+vala print all type function
+include array
+
+9
+vala using lua
+failed to find lua.h
+
+hope lua print to  vala print
+
+
+
+
+10
+fix dbl .sh by new function
+
+11
+commit some local git
+to my remote git
+
+
+12
+spawn_args pass must parse by
+split by space except in quote
+
+
+Process.spawn_async_with_pipes(cdir,
+	spawn_args
+
+
+13
+sort column by click column hearder
+
+14
+re insert column by multi attributes
+
+15
+re code GUI class GTK class
+
+16
+parse string by lua
+
+17 ctrl +z
+
+proxy passing args by lua or bash
+is quit easy to crash
+
+18	[ok] set png 24px
+ icon use local png
+
+19
+bind ico and exe
+in linux
+
+everything copy search "-v png" "-v vala" "-v git"
+
+
+
+18
+test st3 new file is  utf8 or ansi
+without plugin
+
+
+19
+locate cant index scan path include
+symbolic link
+
+
+fix by bash realpath
+  locate -i -e "$(realpath "$*")"
+
+20
+
+
+updatedb how to include this
+updatedb set cat /etc/updatedb.conf
+can set PRUNEPATHS remove /media
+
+
+
+21
+return updatedb ret
+
+
+
+22
+merge realpath by find
+and locate | grep
+
+by uniq
+
+23
+not
+find . ! -readable -prune -o -print
+
+24 regex
+
+25
+add folder
+filter *.jpg by side favor folder
+
+26
+into updatedb mlocate source
+to inlcude search link path
+by redirect link to last resolve path search
+
+27 input delay optimistic
+if last_search_text is ^subtext of current_text
+then search by filter last resaults
+
+28
+mini to tray icon
+
+29	[ok] set icon 24px
+heardbar icon size
+
+30  same as 19
+exe bind pack ico to exe
+
+31
+add camel style to st3
+
+
+32
+tree view add icon
+
+33
+side bar
+to faver file dir search_text
+
+#============================
+# test demo
+#============================
+
+ * ^ $
+ : maybe specfic type
++ - = | [] not used
+maybe ! represent not
+
+# base search
+everything drive_d work
+
+# base search path without space
+/home/me/.bashrc
+
+# path with space
+/drive_d/work/everything search copy/todo
+
+
+
+# with wild card
+2 *.jpg
+# with base match
+3 work everything todo$
+4 "everything search copy" vala$
+5 "everything search copy" "-v vala$"
+
+# with quotes or not
+"/home/me/work/everything search copy/todo"
+/home/me/work/everything search copy/todo
+
+
+# with symbol link
+ "/home/me/work/everything search copy/todo"
+
+
+
+
+a
