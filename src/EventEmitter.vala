@@ -37,9 +37,9 @@ public class EventEmitter : GLib.Object {
   public signal void input_enter(string text);
 
 
-  public signal void search_start(string text);
-  public signal void search_cancel(string text = null);
-  public signal void search_end(string text = null);
+  public signal void search_start(int session_id);
+  public signal void search_cancel(int session_id);
+  public signal void search_end(int session_id);
 
   public signal void updatedb_start(string text = null);
   public signal void updatedb_cancel(string text = null);
@@ -57,6 +57,6 @@ public class EventEmitter : GLib.Object {
 
 
   // m2v
-  public signal void find_a_result(string line);
+  public signal void find_a_result(string line, int session_id);
 
 }

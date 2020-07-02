@@ -22,7 +22,7 @@ valac --disable-warnings --fatal-warnings \
  SearchEngine.vala \
  FileProps.vala \
  main.vala \
- -o "../dist/Anything-in-Linux" && "../dist/Anything-in-Linux"
+ -o "../dist/anything" && "../dist/anything"
 
  # Application.vala \
  # util.vala app.vala main.vala \

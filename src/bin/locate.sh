@@ -52,11 +52,19 @@ function main() {
     return 0
   fi
 
+  # if [ ${#text} -le 2 ]; then
+  #   fs_multi "$@" | uniq | head -n 30
+  # else
+  #   fs_multi "$@" | uniq | head -n 60
+  # fi
+
   if [ ${#text} -le 2 ]; then
-    fs_multi "$@" | uniq | head -n 30
+    fs_multi "$@" | uniq | head -n 100
   else
-    fs_multi "$@" | uniq | head -n 60
+    fs_multi "$@" | uniq | head -n 200
   fi
+
+
   return 0
 }
 

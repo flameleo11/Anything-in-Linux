@@ -21,14 +21,14 @@ public class ListViewColumn : TreeViewColumn {
 		if (hasIcon) {
 			var crp = new CellRendererPixbuf ();
 			this.pack_start (crp, false);
-			this.add_attribute (crp, "pixbuf", 4);
+			this.add_attribute (crp, "gicon", 0);
 		}
 		// tree_view.insert_column (col, –1);
 
 		// col header text front
     var crt = new CellRendererText ();
     crt.xalign = xalign;
-		this.pack_start(crt, true);
+		this.pack_start(crt, false);
 		this.add_attribute (crt, "text", index);
 		// this.set_attributes(
 		// 	crt, "text", index, null);

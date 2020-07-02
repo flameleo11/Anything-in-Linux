@@ -2,9 +2,32 @@ using Gtk;
 using Gee;
 using Posix;
 
+
+enum ListColumns {
+	ICON,
+	NAME,
+	PATH,
+	SIZE_DESC,
+	MIME_TYPE,
+	DATE,
+	SIZE,
+	FILE_TYPE,
+	IS_SYMLINK,
+	IS_HIDDEN,
+	IS_BACKUP,
+	ACCESS_TIME,
+	CHANGED_TIME,
+	MODIFIED_TIME,
+	NAME_WITH_ICON,
+	CREATE_TIME,
+	OWNER,
+	PERMISSIONS
+}
+
 public class ListView : ScrolledWindow {
 	// SearchEntry m_input;
 	EventEmitter events = EventEmitter.Get();
+	private uint _tm_pop_copy_ok_tip = 0;
 
   TreeIter m_iter;
   Gtk.ListStore m_listmodel;
@@ -16,9 +39,15 @@ public class ListView : ScrolledWindow {
   string m_click_text = "";
 
 
+  Gdk.Pixbuf m_icon_folder = null;
+  Gdk.Pixbuf m_icon_file = null;
+	unowned Gtk.IconTheme m_icon_theme = null;
+
+
 
   // ScrolledWindow integrated TreeView
 	public ListView () {
+		this.setup_icons();
 
     m_view = new Gtk.TreeView ();
     setup_treeview(m_view);
@@ -37,7 +66,7 @@ public class ListView : ScrolledWindow {
 
 
     this.selection.changed.connect( () => {
-			if( this.get_sel_col_str (out m_current_path, 1) ) {
+			if( this.get_sel_col_str (out m_current_path, ListColumns.PATH) ) {
 				print("[selection changed] m_current_path", m_current_path);
 			}
 		});
@@ -53,6 +82,18 @@ public class ListView : ScrolledWindow {
 				events.click_text(m_click_text, m_current_path);
 			}
 		});
+
+    var m11 = new Gtk.MenuItem.with_label ("Copied");
+    // // var separator = new Gtk.SeparatorMenuItem ();
+
+    var menu2 = new Gtk.Menu ();
+    menu2.attach_to_widget (this, null);
+    menu2.append (m11);
+
+		// m_menu.vexpand = true;
+		menu2.show_all ();
+
+
 
     var m1 = new Gtk.MenuItem.with_label ("open");
     var m2 = new Gtk.MenuItem.with_label ("open folder");
@@ -112,6 +153,7 @@ public class ListView : ScrolledWindow {
 				if (m_click_text != null && m_click_text.length > 0) {
 					// events.copy_text(m_click_text);
 					events.double_click_text(m_click_text, m_current_path);
+
 				}
 			}
 
@@ -135,10 +177,35 @@ public class ListView : ScrolledWindow {
 		});
 
 
+		// todo 
+		// popup menu will get forcus, 
+		// though triple click will not working
+		events.copy_text_ok.connect ((text) => {
+			// if (this._tm_pop_copy_ok_tip != 0) {
+			// 	removeTimer(this._tm_pop_copy_ok_tip);
+			// 	this._tm_pop_copy_ok_tip = 0;
+			// }
+
+			// menu2.popdown ();
+			// menu2.popup_at_pointer ();
+			// 	// menu2.set_active(0);
+
+			// this._tm_pop_copy_ok_tip = setTimeout(()=>{
+			// 	menu2.popdown ();
+			// }, 350);
+
+		});
 
 
 
-		events.find_a_result.connect ((line) => {
+		events.find_a_result.connect ((line, session_id) => {
+			var current_session_id = SearchEngine.c_session_id;
+			if (session_id != current_session_id) {
+				var msg2 = ("[info] %d skip(%d) :  %s").printf(current_session_id, session_id, line);
+				print(msg2);
+				return ;
+			}
+
 			var path = line.strip();
 
 			// todo change colum by add return index
@@ -146,13 +213,6 @@ public class ListView : ScrolledWindow {
 			FileProps prop = new FileProps.async(path);
 		  print(prop.name);
 		  print(prop.path);
-			// string[] data = {
-			// 		prop.name,
-			// 		prop.path,
-			// 		"",
-			// 		""
-			// 	};
-			// this.add_line(data);
 
 			prop.query_info.connect ((info) => {
 				var name        = prop.name;
@@ -160,15 +220,27 @@ public class ListView : ScrolledWindow {
 				var size_desc   = prop.size_desc;
 				var access_time = prop.access_time;
 				var mime_type   = prop.mime_type;
+				var icon_tag    = mime_type;
+				var icon        = prop.icon;
+
 
 				string[] data = {
+						icon_tag,
 						name,
 						path,
 						size_desc,
+						mime_type,
 						access_time
 					};
-				this.add_line(data);
+
+				var expired = (session_id < current_session_id)	;
+
+				this.add_line(data, icon, expired);
+				// if (session_id == current_session_id) {
+				// 	this.add_line(data, icon, expired);
+				// }
 			});
+
 
 		});
 
@@ -202,6 +274,18 @@ public class ListView : ScrolledWindow {
 
 	}
 
+	public void setup_icons() {
+		m_icon_theme = Gtk.IconTheme.get_default ();
+		m_icon_folder = m_icon_theme.load_icon_for_scale (
+				"system-file-manager", Gtk.IconSize.SMALL_TOOLBAR, 1, Gtk.IconLookupFlags.FORCE_SVG );
+
+		m_icon_file = m_icon_theme.load_icon_for_scale (
+				"gnome-documents.svg", Gtk.IconSize.SMALL_TOOLBAR, 1, Gtk.IconLookupFlags.FORCE_SVG );
+
+		// return "";
+	}
+
+
 
 	public string get_cursor() {
 		TreePath path;
@@ -227,30 +311,61 @@ public class ListView : ScrolledWindow {
 		return false;
 	}
 
-	public void add_line(string[] data) {
+	public void add_line(string[] data, Icon icon = null, bool expired = false) {
 
 		// m_listmodel.prepend (out m_iter);
-		m_listmodel.append (out m_iter);
-
-
-		unowned Gtk.IconTheme icon_theme = Gtk.IconTheme.get_default ();
-		var pix_icon = icon_theme.load_icon_for_scale (
-				"system-file-manager", Gtk.IconSize.SMALL_TOOLBAR, 1, Gtk.IconLookupFlags.FORCE_SVG );
+		if (expired) {
+			m_listmodel.prepend (out m_iter);
+		} else {
+			m_listmodel.append (out m_iter);
+		}
 
 		// var ico = new Gdk.Pixbuf.from_file ("./res/anything01.png");
 		// if (iconFile != null) {
 		// 	ico = new Gdk.Pixbuf.from_file (iconFile);
 		// }
 
+		var mime_type = data[ListColumns.MIME_TYPE];
+		var ico = icon;
+		if (ico == null) {
+			ico = GLib.ContentType.get_icon(mime_type);
+		}
+
 		m_listmodel.set (m_iter,
-				0, data[0],
+				0, ico,
 				1, data[1],
 				2, data[2],
 				3, data[3],
-				4, pix_icon
+				4, data[4],
+				5, data[5]
 			);
 	}
 
+	public void remove_line(string[] data, Icon icon = null) {
+
+		// m_listmodel.prepend (out m_iter);
+		m_listmodel.append (out m_iter);
+
+		// var ico = new Gdk.Pixbuf.from_file ("./res/anything01.png");
+		// if (iconFile != null) {
+		// 	ico = new Gdk.Pixbuf.from_file (iconFile);
+		// }
+
+		var mime_type = data[ListColumns.MIME_TYPE];
+		var ico = icon;
+		if (ico == null) {
+			ico = GLib.ContentType.get_icon(mime_type);
+		}
+
+		m_listmodel.set (m_iter,
+				0, ico,
+				1, data[1],
+				2, data[2],
+				3, data[3],
+				4, data[4],
+				5, data[5]
+			);
+	}
 	public void clear() {
 		m_listmodel.clear();
 	}
@@ -262,12 +377,15 @@ public class ListView : ScrolledWindow {
 		m_view.set_reorderable (true);
 		m_view.activate_on_single_click = true;
 
-		m_listmodel = new Gtk.ListStore ( 5,
+		m_listmodel = new Gtk.ListStore ( 6,
+			// typeof (Gdk.Pixbuf),
+			typeof (GLib.Icon),
+
 			typeof (string),
 			typeof (string),
 			typeof (string),
 			typeof (string),
-			typeof (Gdk.Pixbuf)
+			typeof (string)
 		 );
 		m_view.set_model (m_listmodel);
 
@@ -280,11 +398,13 @@ public class ListView : ScrolledWindow {
 		// ArrayList<string> arr_col_name = arr;
 		// var len = arr_col_name.size;
 
-		int[] arr_col_width = {200, 400, 100, 200};
+		int[] arr_col_width = {0, 200, 400, 100, 200, 200};
 		string[] arr_col_name = {
+			  "",
 				"Name",
 				"Path",
 				"Size",
+				"Type",
 				"Date"
 			};
 		var len = arr_col_name.length;
@@ -292,10 +412,14 @@ public class ListView : ScrolledWindow {
 			var title = arr_col_name[i];
 			var width = arr_col_width[i];
 			var hasIcon = (title == "Name");
-			ListViewColumn col = new ListViewColumn(
-				i, title, width, hasIcon);
 
-    	m_view.append_column(col);
+			if (title.length > 0) {
+				// todo pass icon data index to 
+				ListViewColumn col = new ListViewColumn(
+					i, title, width, hasIcon);
+    		m_view.append_column(col);
+			}
+
 		}
 
 

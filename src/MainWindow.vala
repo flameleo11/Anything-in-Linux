@@ -57,7 +57,7 @@ public class MainWindow : Window {
 		events.updatedb_end.connect ((tag) => {
 			print("222.......updatedb_end", tag);
 			if (tag == "init") {
-				events.search_start("/drive_d/");
+				events.input_enter("/drive_d/");
 			}
 		});		
 	}
