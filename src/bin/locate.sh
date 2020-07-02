@@ -45,7 +45,8 @@ function fs_multi() {
 function main() {
   local text="$*"
   # msgbox total: "$@"  len: ${#text}
-
+  # msgbox "$@" "$1" "$2" "$3" "$*"
+  
   if [ -z "$1" ]; then
     sudo updatedb
     return 0

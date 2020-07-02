@@ -31,7 +31,6 @@ public class EventEmitter : GLib.Object {
   public signal void copy_text_ok(string text);
   public signal void add_item(string x);
 
-
   // v2c
   public signal void test(string x);
   public signal void input_changed(string text);
@@ -46,9 +45,18 @@ public class EventEmitter : GLib.Object {
   public signal void updatedb_cancel(string text = null);
   public signal void updatedb_end(string text = null);
 
+  public signal void open(string text);
+  public signal void open_folder(string text);
+
+  public signal void click_text(string text);
+  public signal void double_click_text(string text);
+  public signal void triple_click_text(string text);
+
+
+
+
+
   // m2v
   public signal void find_a_result(string line);
-
-
 
 }

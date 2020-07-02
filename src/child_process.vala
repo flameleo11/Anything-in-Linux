@@ -29,6 +29,9 @@ ProcessObject spawn(string cmd, string[] args = {}) {
 		spawn_args += v;
 	}
 
+print(cmd, "............<<<<<<<<");
+tprint(spawn_args);
+print("............>>>>>");
 	try {
 		string cdir = GLib.Environment.get_current_dir();
 		string[] spawn_env = Environ.get ();

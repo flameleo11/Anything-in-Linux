@@ -52,7 +52,14 @@ public class MainWindow : Window {
 	}
 
 	public void start() {
+		print("111.......updatedb_start init");
 		events.updatedb_start("init");
+		events.updatedb_end.connect ((tag) => {
+			print("222.......updatedb_end", tag);
+			if (tag == "init") {
+				events.search_start("t1.lua");
+			}
+		});		
 	}
 
 	public void setup_app_icons () {

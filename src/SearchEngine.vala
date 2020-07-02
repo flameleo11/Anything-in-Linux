@@ -7,14 +7,13 @@ public class SearchEngine {
 
 
 	public SearchEngine () {
-		events.updatedb_start.connect ((text) => {
-
+		events.updatedb_start.connect ((tag) => {
+			// string tag2 = tag;
 			// ProcessObject ps = spawn("sudo", {"updatedb"});
 			ProcessObject ps = spawn("bash", {"./bin/updatedb.sh"});
-
 			ps.stdout.connect ((event, data) => {
 				if (event == "end") {
-					events.updatedb_end();
+					events.updatedb_end(tag);
 				}
 			});
 
@@ -38,6 +37,7 @@ public class SearchEngine {
 
 		events.input_enter.connect ((text) => {
 			events.search_start(text);
+			print("search_start", text);
 		});
 
 
@@ -51,13 +51,33 @@ public class SearchEngine {
 
 		});
 
+		// always open parent folder, no matter path specific file or directory
+		events.open_folder.connect ((path) => {
+			// if (GLib.FileUtils.test(m_current_path, GLib.FileTest.IS_DIR)) {
+			// 	var cmd = ("xdg-open %s").printf(m_current_path);
+			//   print("22 xdg-open ".concat(m_current_path));
+			// }else {
+			// 	var cmd = ("xdg-open $(dirname -- \"%s\")").printf(m_current_path);
+			// 	print("33", s);
+			// }
+			// Posix.system("xdg-open ".concat(m_current_path));			
+			// var cmd = "bash ./bin/open_folder.sh " + path;
+			// ProcessObject ps = spawn("bash", {"-c", cmd});
+			ProcessObject ps = spawn("bash", {"./bin/open_folder.sh", path});
+
+		});
 
 	}
 
 	void find (string text) {
-		// string[] args = text.split (" ");
+		// using shell to split params, parse space or quote
 		string command_line = "bash ./bin/locate.sh " + text;
 		ProcessObject ps = spawn("bash", {"-c", command_line});
+
+		// if do this, the params test will consider a single string
+		// string[] args = text.split (" ");
+		// ProcessObject ps = spawn("bash", {"./bin/locate.sh", text});
+
 		ps.stdout.connect ((event, data) => {
 			if (event == "line") {
 				string line = data[0];
@@ -69,18 +89,6 @@ public class SearchEngine {
 			if (event == "end") {
 				events.updatedb_end();
 			}
-		});
-	}
-
-	void updatedb (string text) {
-		ProcessObject ps = spawn("sudo updatedb");
-		ps.stdout.connect ((event, data) => {
-			if (event == "line") {
-				stdout.printf("res...... %s", data[0]);
-			}
-		});
-		ps.close.connect ((pid, status) => {
-
 		});
 	}
 

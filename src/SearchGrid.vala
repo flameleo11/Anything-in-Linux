@@ -47,8 +47,8 @@ public class SearchGrid : Grid {
 
 		m_input.activate.connect (()=>{
 			var text = m_input.text;
-			events.input_enter(text);
 			print("Press Enter: ", text);
+			events.input_enter(text);
 		});
 
 	}

@@ -15,22 +15,22 @@ string size_fmt(int64 num, string suffix="B") {
   string[] arr = {"","K","M","G","T","P","E","Z"};
   foreach (string unit in arr) {
     if (num.abs() < 1000) {
-      return ("%3.1f%s%s").printf(num, unit, suffix);
+      return ("%3.1f %s%s").printf(num, unit, suffix);
     }
     num /= 1000;
   }
-  return ("%.1f%s%s").printf(num, "Y", suffix);
+  return ("%.1f %s%s").printf(num, "Y", suffix);
 }
 
 string size_fmt_i(int64 num, string suffix="B") {
   string[] arr = {"","Ki","Mi","Gi","Ti","Pi","Ei","Zi"};
   foreach (string unit in arr) {
     if (num.abs() < 1024.0) {
-      return ("%3.1f%s%s").printf(num, unit, suffix);
+      return ("%3.1f %s%s").printf(num, unit, suffix);
     }
     num /= 1024;
   }
-  return ("%.1f%s%s").printf(num, "Yi", suffix);
+  return ("%.1f %s%s").printf(num, "Yi", suffix);
 }
 
 string tjoin(string[] a, string sep="") {

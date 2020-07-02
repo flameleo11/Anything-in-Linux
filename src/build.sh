@@ -1,9 +1,13 @@
 #!/bin/bash
 
+# todo copy res folder to dist
+# cp res
+
 
 # --pkg lua
 valac --disable-warnings --fatal-warnings \
  --pkg gtk+-3.0 --pkg gee-0.8 \
+ --pkg posix \
  util.vala \
  child_process.vala \
  EventEmitter.vala \
@@ -18,7 +22,7 @@ valac --disable-warnings --fatal-warnings \
  SearchEngine.vala \
  FileProps.vala \
  main.vala \
- -o "./dist/Anything in Linux" && "./dist/Anything in Linux"
+ -o "../dist/Anything-in-Linux" && "../dist/Anything-in-Linux"
 
  # Application.vala \
  # util.vala app.vala main.vala \
