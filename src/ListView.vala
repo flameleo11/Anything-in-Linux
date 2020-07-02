@@ -42,23 +42,16 @@ public class ListView : ScrolledWindow {
 			}
 		});
 
-		// todo update by active single click then 
-		// response in button_press_event
-
-		// response double click by set
-		// view.activate_on_single_click = false;
+		// response single_click
+		// m_view.activate_on_single_click = true;
 		m_view.row_activated.connect ((path, col0) => {
 			ListViewColumn col = (ListViewColumn) col0;
+			// print("title, line_num", i2s(col.index), col.get_title(), path.to_string());
+			// test row_activated triggered after selection changed
 			if( this.get_sel_col_str (out m_click_text, col.index) ) {
 				print("[row_activated] m_click_text", m_click_text);
-				events.click_text(m_click_text);
+				events.click_text(m_click_text, m_current_path);
 			}
-			// if( this.get_sel_col_str (out m_dbclk_text, col.index) ) {
-			// 	print("double click copy_text", m_dbclk_text);
-			// 	events.copy_text(m_dbclk_text);
-			// }
-
-			// print("title, line_num", i2s(col.index), col.get_title(), path.to_string());
 		});
 
     var m1 = new Gtk.MenuItem.with_label ("open");
@@ -118,7 +111,7 @@ public class ListView : ScrolledWindow {
 				&& e.type == Gdk.EventType.@2BUTTON_PRESS ) {
 				if (m_click_text != null && m_click_text.length > 0) {
 					// events.copy_text(m_click_text);
-					events.double_click_text(m_click_text);
+					events.double_click_text(m_click_text, m_current_path);
 				}
 			}
 
@@ -126,7 +119,7 @@ public class ListView : ScrolledWindow {
 			if ( e.button == 1
 				&& e.type == Gdk.EventType.@3BUTTON_PRESS ) {
 				print("左键3击", i2s((int)e.type), i2s( (int)e.button));
-				events.triple_click_text(m_click_text);
+				events.triple_click_text(m_click_text, m_current_path);
 			}
 
 			// todo press ctrl force open or copy
@@ -184,6 +177,7 @@ public class ListView : ScrolledWindow {
 		});
 
 
+
 		// var testNum = 8;
 		// for (int i = 0; i < testNum; i++) {
 		// 	this.add_line({
@@ -194,14 +188,15 @@ public class ListView : ScrolledWindow {
 		// 		});
 		// }
 
-		events.add_item.connect ((text) => {
-			// string[] data = {
-			// 		text,
-			// 		randstr(20),
-			// 		randstr(6),
-			// 		randstr(12)
-			// 	};
-			// this.add_line(data);
+		events.click_text.connect ((text) => {
+			// todo press ctrl 
+			// force open file 
+		});
+		events.double_click_text.connect ((text, path) => {
+			events.copy_text(text);
+		});
+		events.triple_click_text.connect ((text, path) => {
+			events.open(path);
 		});
 
 
@@ -237,11 +232,22 @@ public class ListView : ScrolledWindow {
 		// m_listmodel.prepend (out m_iter);
 		m_listmodel.append (out m_iter);
 
+
+		unowned Gtk.IconTheme icon_theme = Gtk.IconTheme.get_default ();
+		var pix_icon = icon_theme.load_icon_for_scale (
+				"system-file-manager", Gtk.IconSize.SMALL_TOOLBAR, 1, Gtk.IconLookupFlags.FORCE_SVG );
+
+		// var ico = new Gdk.Pixbuf.from_file ("./res/anything01.png");
+		// if (iconFile != null) {
+		// 	ico = new Gdk.Pixbuf.from_file (iconFile);
+		// }
+
 		m_listmodel.set (m_iter,
 				0, data[0],
 				1, data[1],
 				2, data[2],
-				3, data[3]
+				3, data[3],
+				4, pix_icon
 			);
 	}
 
@@ -256,11 +262,13 @@ public class ListView : ScrolledWindow {
 		m_view.set_reorderable (true);
 		m_view.activate_on_single_click = true;
 
-		m_listmodel = new Gtk.ListStore ( 4,
+		m_listmodel = new Gtk.ListStore ( 5,
 			typeof (string),
 			typeof (string),
 			typeof (string),
-			typeof (string) );
+			typeof (string),
+			typeof (Gdk.Pixbuf)
+		 );
 		m_view.set_model (m_listmodel);
 
 
@@ -283,8 +291,9 @@ public class ListView : ScrolledWindow {
 		for (int i = 0; i < len; i++) {
 			var title = arr_col_name[i];
 			var width = arr_col_width[i];
+			var hasIcon = (title == "Name");
 			ListViewColumn col = new ListViewColumn(
-				i, title, width);
+				i, title, width, hasIcon);
 
     	m_view.append_column(col);
 		}

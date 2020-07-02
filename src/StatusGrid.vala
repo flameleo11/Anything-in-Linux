@@ -62,12 +62,12 @@ public class StatusGrid : Grid {
 		// 	}, 4000);
 		// });
 
-		events.updatedb_start.connect ((text) => {
+		events.updatedb_start.connect ((tag) => {
 			// m_statusItem.label = ("updatedb -- %s").printf(text);
 			m_statusItem.label = ("updatedb ...");
 		});
 
-		events.updatedb_end.connect (() => {
+		events.updatedb_end.connect ((tag) => {
 			m_statusItem.label = "";
 		});
 

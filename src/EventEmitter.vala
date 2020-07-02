@@ -48,9 +48,9 @@ public class EventEmitter : GLib.Object {
   public signal void open(string text);
   public signal void open_folder(string text);
 
-  public signal void click_text(string text);
-  public signal void double_click_text(string text);
-  public signal void triple_click_text(string text);
+  public signal void click_text(string text, string path);
+  public signal void double_click_text(string text, string path);
+  public signal void triple_click_text(string text, string path);
 
 
 

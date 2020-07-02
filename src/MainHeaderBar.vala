@@ -12,10 +12,13 @@ public class MainHeaderBar : HeaderBar {
 
 		// Image ico = new Image.from_file("./res/anything01.png");
 		Image ico = new Image.from_icon_name(
-				"preferences-system-search",
+				// "preferences-system-search",
+				"system-file-manager",
+				
 				IconSize.LARGE_TOOLBAR
 				// IconSize.SMALL_TOOLBAR
 			);
+
 
 		this.add(ico);
 	}

@@ -66,6 +66,9 @@ public class SearchEngine {
 			ProcessObject ps = spawn("bash", {"./bin/open_folder.sh", path});
 
 		});
+		events.open.connect ((path) => {
+			ProcessObject ps = spawn("bash", {"./bin/open.sh", path});
+		});
 
 	}
 
@@ -87,7 +90,7 @@ public class SearchEngine {
 		});
 		ps.stdout.connect ((event, data) => {
 			if (event == "end") {
-				events.updatedb_end();
+				events.updatedb_end("end");
 			}
 		});
 	}

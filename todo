@@ -6,6 +6,31 @@ menu
 status
 
 
+显示文件 文件夹图标
+和文件 mime属性
+
+
+tree view 按键响应有问题
+单击响应 在 get_selected 之前
+说是用 get_cursor 
+但是 获得的 tree_path treecolumnitem 也是上一个
+
+还有说是 在 cursor changed中响应
+
+感觉很麻烦
+都没有一个直接响应双击 然后 双击的什么文件
+单击 ,单击的哪个项目
+
+
+
+获取 modify ctrl是否按下 只能在 button press 事件中
+应该有一个全局获取是否按下的函数
+
+
+
+搜索引擎还没有优化
+还是存在多次搜索,结果混在一起的问题
+
 
 
 
