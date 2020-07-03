@@ -30,7 +30,7 @@ public class ListView : ScrolledWindow {
 	private uint _tm_pop_copy_ok_tip = 0;
 
   TreeIter m_iter;
-  Gtk.ListStore m_listmodel;
+  Gtk.ListStore m_liststore;
   Gtk.TreeView m_view;
 
   TreeSelection selection;
@@ -43,6 +43,7 @@ public class ListView : ScrolledWindow {
   Gdk.Pixbuf m_icon_file = null;
 	unowned Gtk.IconTheme m_icon_theme = null;
 
+	public delegate int TreeIterCompareFunc (TreeModel model, TreeIter a, TreeIter b);
 
 
   // ScrolledWindow integrated TreeView
@@ -270,8 +271,135 @@ public class ListView : ScrolledWindow {
 		events.triple_click_text.connect ((text, path) => {
 			events.open(path);
 		});
+		events.headers_clicked.connect ((columnIndex, order) => {
+			// m_liststore.set_sort_func(ListColumns.PATH, foler_file_TreeIterCompareFunc);
+			m_liststore.set_sort_column_id(columnIndex, order);
+		});
+		events.reset_order.connect ((tag) => {
+			m_liststore.set_sort_func(ListColumns.ICON, foler_file_TreeIterCompareFunc);
+			m_liststore.set_sort_column_id(ListColumns.ICON, SortType.ASCENDING);
+		});
 
 
+
+		events.test.connect ((text) => {
+			// m_liststore.set_sort_column_id(ListColumns.NAME, SortType.ASCENDING);
+			// m_liststore.set_sort_column_id(ListColumns.PATH, SortType.DESCENDING);
+			SortType order;
+			int sort_column_id;
+			bool ret = m_liststore.get_sort_column_id(out sort_column_id, out order);
+				print(b2s(ret), i2s(sort_column_id), order.to_string());
+			if (ret) {
+
+			}
+			string name;
+			TreeIter iter;
+			m_liststore.get_iter_first(out iter);
+
+			m_liststore.get (iter, ListColumns.NAME, out name, -1 );
+			print(">>>>> name", name.to_string());
+
+			m_liststore.set_sort_func(ListColumns.PATH, foler_file_TreeIterCompareFunc);
+			m_liststore.set_sort_column_id(ListColumns.PATH, SortType.ASCENDING);
+
+		});
+
+
+
+
+	}
+		// public delegate int TreeIterCompareFunc (TreeModel model, TreeIter a, TreeIter b);
+
+	private TreeIterCompareFunc create_column_string_TreeIterCompareFunc (int columnIndex) {
+		return (model, row1, row2) => {
+			string str1;
+			string str2;
+			model.get(row1, columnIndex, out str1);
+			model.get(row2, columnIndex, out str2);
+
+			if (str1 == str2) {
+				return 0;
+			}
+			if (str1 < str2) {
+				return -1;
+			}
+			return 1;
+		};
+	}
+
+	// 参考多列排序规则
+	private TreeIterCompareFunc create_multi_col_TreeIterCompareFunc (int[] arr_columns) {
+		return (model, row1, row2) => {
+			foreach (int columnIndex in arr_columns) {
+				var f = create_column_string_TreeIterCompareFunc (columnIndex);
+				if (f(model, row1, row2) < 0) {
+					return -1;
+				} else if (f(model, row1, row2) > 0) {
+					return 1;
+				}
+			}
+			return 0;
+		};
+	}
+
+	private TreeIterCompareFunc concat_TreeIterCompareFunc (TreeIterCompareFunc f1, TreeIterCompareFunc f2) {
+		return (model, row1, row2) => {
+			if (f1(model, row1, row2) < 0) {
+				return -1;
+			} else if (f1(model, row1, row2) > 0) {
+				return 1;
+			}
+			if (f2(model, row1, row2) < 0) {
+				return -1;
+			} else if (f2(model, row1, row2) > 0) {
+				return 1;
+			}
+			return 0;
+		};
+	}
+
+
+	int std_str_compare(string str1, string str2) {
+		if (str1 < str2) {
+			return -1;
+		} else if (str1 > str2) {
+			return 1;
+		}
+		return 0;
+	}
+
+	// type
+	// inode/directory
+	private int foler_file_TreeIterCompareFunc (TreeModel model, TreeIter row1, TreeIter row2) {
+		string type1;
+		string type2;
+		string name1;
+		string name2;
+		string path1;
+		string path2;
+
+		model.get(row1, ListColumns.MIME_TYPE, out type1);
+		model.get(row2, ListColumns.MIME_TYPE, out type2);
+		model.get(row1, ListColumns.NAME, out name1);
+		model.get(row2, ListColumns.NAME, out name2);
+		model.get(row1, ListColumns.PATH, out path1);
+		model.get(row2, ListColumns.PATH, out path2);
+
+		if  ( (type1 == "inode/directory" && type2 == "inode/directory")
+			 || (type1 != "inode/directory" && type2 != "inode/directory")) {
+			return std_str_compare(path1, path2);
+		}
+
+		if (type1 == "inode/directory") {
+			return -1;
+		} else if (type2 == "inode/directory") {
+			return 1;
+		}
+
+		print("[error] neigher 1 or 2 is inode/directory", name1, type1, name2, type2);
+		// print("[>>>>] cmp", str1, str2, i2s( std_str_compare(str1, str2) ) );
+
+		return std_str_compare(name1, name2);
 	}
 
 	public void setup_icons() {
@@ -313,11 +441,11 @@ public class ListView : ScrolledWindow {
 
 	public void add_line(string[] data, Icon icon = null, bool expired = false) {
 
-		// m_listmodel.prepend (out m_iter);
+		// m_liststore.prepend (out m_iter);
 		if (expired) {
-			m_listmodel.prepend (out m_iter);
+			m_liststore.prepend (out m_iter);
 		} else {
-			m_listmodel.append (out m_iter);
+			m_liststore.append (out m_iter);
 		}
 
 		// var ico = new Gdk.Pixbuf.from_file ("./res/anything01.png");
@@ -331,7 +459,7 @@ public class ListView : ScrolledWindow {
 			ico = GLib.ContentType.get_icon(mime_type);
 		}
 
-		m_listmodel.set (m_iter,
+		m_liststore.set (m_iter,
 				0, ico,
 				1, data[1],
 				2, data[2],
@@ -343,8 +471,8 @@ public class ListView : ScrolledWindow {
 
 	public void remove_line(string[] data, Icon icon = null) {
 
-		// m_listmodel.prepend (out m_iter);
-		m_listmodel.append (out m_iter);
+		// m_liststore.prepend (out m_iter);
+		m_liststore.append (out m_iter);
 
 		// var ico = new Gdk.Pixbuf.from_file ("./res/anything01.png");
 		// if (iconFile != null) {
@@ -357,7 +485,7 @@ public class ListView : ScrolledWindow {
 			ico = GLib.ContentType.get_icon(mime_type);
 		}
 
-		m_listmodel.set (m_iter,
+		m_liststore.set (m_iter,
 				0, ico,
 				1, data[1],
 				2, data[2],
@@ -367,7 +495,7 @@ public class ListView : ScrolledWindow {
 			);
 	}
 	public void clear() {
-		m_listmodel.clear();
+		m_liststore.clear();
 	}
 
 	private void setup_treeview (TreeView view) {
@@ -377,17 +505,21 @@ public class ListView : ScrolledWindow {
 		m_view.set_reorderable (true);
 		m_view.activate_on_single_click = true;
 
-		m_listmodel = new Gtk.ListStore ( 6,
+		m_liststore = new Gtk.ListStore ( 6,
 			// typeof (Gdk.Pixbuf),
 			typeof (GLib.Icon),
-
 			typeof (string),
 			typeof (string),
 			typeof (string),
 			typeof (string),
 			typeof (string)
 		 );
-		m_view.set_model (m_listmodel);
+		m_view.set_model (m_liststore);
+
+		// SortType. ASCENDING 
+		// SortType.DESCENDING
+		// m_liststore.set_sort_func(ListColumns.ICON, foler_file_TreeIterCompareFunc);
+		// m_liststore.set_sort_column_id(ListColumns.ICON, SortType.ASCENDING);
 
 
 		// var arr = new ArrayList<string> ();

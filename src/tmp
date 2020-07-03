@@ -1,0 +1,56 @@
+
+anything.sh
+anything.sh 设置1.30版本
+
+EventEmitter.vala
+事件派发混乱
+混合者多种
+
+把视图的交互也放到 事件里 了
+  // view
+  public signal void headers_clicked(int index, SortType order);
+  public signal void reset_order(string tag);
+
+ListView.vala
+列表排序函数,多种功能
+add_line 与多个次搜索,配合显示的逻辑,还没有完善
+
+ListViewColumn.vala
+中也有排序功能
+点击表头显示排序指示器
+以及配发事件排序
+添加指示器显示生命周期,几秒后消失
+
+MainMenu.vala
+增加view菜单,重置排序
+todo 增加 view子菜单
+
+MainWindow.vala
+中初始化更新,结束事件触发 默认搜索
+放到搜索引擎中处理
+
+
+SearchEngine.vala
+cache end事件,记录多次搜索那个结束了,还要搜搜返回的结果数量
+利用hashtable
+
+
+
+StatusGrid.vala
+新的进度条更新逻辑(还是不完善),
+多个搜索结束后,清零进度条
+根据 SearchEngine cache end hashtable
+判定最新的搜索是否已经结束,
+如果结束,过期的搜索结束后重置 进度条
+
+
+
+
+locate.sh
+测试返回数值 30 100 1000
+到 1000 以上会感觉慢了,所以一般不需要特别多
+
+fssearch 基本搜索只返回30个数值
+设置多 了估计也慢
+操 他这个返回很快啊,马上就返回了3000个数值
+看起来自己缓存返回出来

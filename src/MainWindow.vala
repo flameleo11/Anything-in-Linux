@@ -13,6 +13,7 @@ public class MainWindow : Window {
 	SearchEngine m_engine;
 
 
+
 	public MainWindow () {
 		m_engine = new SearchEngine();
 
@@ -54,12 +55,7 @@ public class MainWindow : Window {
 	public void start() {
 		print("111.......updatedb_start init");
 		events.updatedb_start("init");
-		events.updatedb_end.connect ((tag) => {
-			print("222.......updatedb_end", tag);
-			if (tag == "init") {
-				events.input_enter("/drive_d/");
-			}
-		});		
+
 	}
 
 	public void setup_app_icons () {

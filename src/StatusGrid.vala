@@ -114,7 +114,7 @@ public class StatusGrid : Grid {
 		});
 
 		events.search_end.connect ((session_id) => {
-			print("######2222#######", i2s(session_id));
+			
 			var pre_end_id = session_id;
 			// m_statusItem.label += ".";
 			// m_statusItem.label += "|";
@@ -128,9 +128,24 @@ public class StatusGrid : Grid {
 						this._tm_update_searching = 0;
 					}					
 					// m_statusItem.label += i2s(session_id);
-					m_statusItem.label = "";
-					m_progress_bar.set_fraction (0.0);
+					print(("[info] end(%d) when find(%d): resetProgressBar").printf(pre_end_id, now_end_id));
+					this.resetProgressBar();
+
+				} else if (pre_end_id < now_end_id) {
+					bool already_end = SearchEngine.c_cache_end.get(now_end_id);
+					if (already_end ) {
+						print(("[info] end(%d) when find(%d) end: resetProgressBar").printf(pre_end_id, now_end_id));
+						this.resetProgressBar();
+					} else {
+						print(("[info] end(%d) when find(%d) searching").printf(pre_end_id, now_end_id));
+
+					}
+
+				} else if (pre_end_id > now_end_id) {
+					print(("[error] end(%d) when find(%d)").printf(pre_end_id, now_end_id));
 				}
+				
+				
 			}, 100);					
 		});
 
@@ -141,6 +156,14 @@ public class StatusGrid : Grid {
 		m_progress_bar.set_fraction (v + 0.01);
 		
 	}
+
+		
+	void resetProgressBar () {
+		m_statusItem.label = "";
+		m_progress_bar.set_fraction (0.0);
+	}
+
+
 
 	void updateCharsetSpiner () {
 		var len = _spin_charset.length;

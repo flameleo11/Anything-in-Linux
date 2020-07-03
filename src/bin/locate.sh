@@ -59,10 +59,17 @@ function main() {
   # fi
 
   if [ ${#text} -le 2 ]; then
-    fs_multi "$@" | uniq | head -n 100
+    fs_multi "$@" | head -n 100
   else
-    fs_multi "$@" | uniq | head -n 200
+    fs_multi "$@" | head -n 200
   fi
+
+
+  # if [ ${#text} -le 2 ]; then
+  #   fs_multi "$@" | uniq | head -n 1000
+  # else
+  #   fs_multi "$@" | uniq | head -n 2000
+  # fi
 
 
   return 0

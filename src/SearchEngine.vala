@@ -9,12 +9,15 @@ public class SearchEngine {
 	public static int c_session_id = 0;
 	// public static int c_cache_count = 0;
 	public static HashTable<int, int> c_cache_count = null;
+	public static HashTable<int, bool> c_cache_end = null;
+
 	// table2 = new HashTable<string, string> (str_hash, str_equal);
 
 	// public static string c_session_id = "t1.lua";
 
 	public SearchEngine () {
 		c_cache_count = new HashTable<int, int> ((i)=>(i), (a, b)=>(a == b));
+		c_cache_end = new HashTable<int, bool> ((i)=>(i), (a, b)=>(a == b));
 
 		events.updatedb_start.connect ((tag) => {
 			// string tag2 = tag;
@@ -28,6 +31,13 @@ public class SearchEngine {
 
 		});
 
+		events.updatedb_end.connect ((tag) => {
+			print("222.......updatedb_end", tag);
+			if ( tag == "init"
+				|| tag == "input_null" ) {
+				events.input_enter("/drive_d/");
+			}
+		});
 		// events.updatedb_cancel.connect ((text) => {
 
 		// });
@@ -37,7 +47,7 @@ public class SearchEngine {
 			print( ("%s, %d").printf(text, text.length) );
 			if (text.length == 0) {
 				events.listview_clear();
-				events.updatedb_start("null text");
+				events.updatedb_start("input_null");
 				return ;
 			}
 
@@ -100,7 +110,8 @@ public class SearchEngine {
 				string line = data[0];
 				c_cache_count.set(session_id, ++count);
 
-				print(("[info] find %d: %s").printf(count, line));
+				print(("[info] (%d) find %s: [%d] = %s").printf(session_id, text, count, line));
+
 
 				events.find_a_result(line, session_id);
 				
@@ -108,6 +119,8 @@ public class SearchEngine {
 		});
 		ps.stdout.connect ((event, data) => {
 			if (event == "end") {
+				print(("[info] (%d) end").printf(session_id));
+				c_cache_end.set(session_id, true);
 				events.search_end(session_id);
 			}
 		});

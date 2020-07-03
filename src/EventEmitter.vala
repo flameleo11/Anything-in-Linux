@@ -1,14 +1,12 @@
-// todo [SingleInstance]
+using Gtk;
 
-	// EventEmitter events = EventEmitter.Get();
-	// events.test.connect ((x) => {
+// EventEmitter events = EventEmitter.Get();
+// events.test.connect ((x) => {
 
-	// });
+// });
 
 public class EventEmitter : GLib.Object {
 	private static EventEmitter _inst = null;
-
-
 
 		// string tag
 	private EventEmitter () {
@@ -22,6 +20,9 @@ public class EventEmitter : GLib.Object {
 		return _inst;
 	}
 
+  // view
+  public signal void headers_clicked(int index, SortType order);
+  public signal void reset_order(string tag);
 
 	// c2v
   public signal void listview_clear();
